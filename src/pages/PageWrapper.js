@@ -1,11 +1,20 @@
-import React from "react";
-import { Box, Typography, Avatar } from "@mui/material";
+import { Box, Typography, ListItemButton, ListItemIcon } from "@mui/material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Logout } from "@mui/icons-material";
 import Sidebar from "./Sidebar";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const PageWrapper = ({ children, pageTitle }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const username = user?.email || "Admin";
+  const username = user?.email || "Bleh";
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -33,12 +42,14 @@ const PageWrapper = ({ children, pageTitle }) => {
         >
           <Typography variant="h6" fontWeight="bold">{pageTitle}</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Avatar src="https://i.pravatar.cc/40" alt={username} />
+            <AccountCircleIcon sx={{ fontSize: 40, color: "primary.main" }} />
             <Typography fontWeight="medium">{username}</Typography>
+          <ListItemButton>
+            <ListItemIcon onClick={handleLogout}><Logout />Exit</ListItemIcon>
+          </ListItemButton>
           </Box>
         </Box>
 
-        {/* Page content */}
         <Box sx={{ mt: 2 }}>{children}</Box>
       </Box>
     </Box>

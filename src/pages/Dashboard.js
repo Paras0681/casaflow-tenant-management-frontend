@@ -37,8 +37,7 @@ const recentActivities = [
 
 const Dashboard = () => {
   return (
-    <PageWrapper>
-      <Typography variant="h4" mb={3}>Dashboard</Typography>
+    <PageWrapper pageTitle="Dashboard">
 
       {/* Stats Cards */}
       <Grid container spacing={3} mb={4}>

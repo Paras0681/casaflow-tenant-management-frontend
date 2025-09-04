@@ -9,7 +9,6 @@ import Dashboard from "./pages/Dashboard";
 import GenerateBillPage from "./pages/GenerateBillPage";
 import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import TenantFormPage from "./pages/TenantFormPage";
 import DocumentUploadPage from "./pages/DocumentUploadPage";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -28,6 +27,7 @@ function App() {
         <Router>
           <AuthProvider>
             <Routes>
+              <Route path="/" element={<Dashboard />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute><Dashboard /></ProtectedRoute>
@@ -35,17 +35,14 @@ function App() {
               <Route path="/bills" element={
                 <ProtectedRoute><GenerateBillPage /></ProtectedRoute>
               } />
-              <Route path="/tenants-profile" element={
-                <ProtectedRoute><TenantsProfilePage /></ProtectedRoute>
+              <Route path="/tenant-docs" element={
+                <ProtectedRoute><DocumentUploadPage /></ProtectedRoute>
               } />
               <Route path="/analytics" element={
                 <ProtectedRoute><AnalyticsPage /></ProtectedRoute>
               } />
-              <Route path="/tenant-form" element={
-                <ProtectedRoute><TenantFormPage /></ProtectedRoute>
-              } />
-              <Route path="/tenant-docs" element={
-                <ProtectedRoute><DocumentUploadPage /></ProtectedRoute>
+              <Route path="/tenants-profile" element={
+                <ProtectedRoute><TenantsProfilePage /></ProtectedRoute>
               } />
             </Routes>
           </AuthProvider>
