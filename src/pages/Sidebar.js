@@ -42,7 +42,7 @@ const Sidebar = () => {
         </ListItemButton>
         <ListItemButton onClick={() => handleNavigation("/bills")}>
           <ListItemIcon><CurrencyRupee /></ListItemIcon>
-          <ListItemText primary="Bills" />
+          <ListItemText primary="Invoice" />
         </ListItemButton>
         <ListItemButton onClick={() => handleNavigation("/analytics")}>
           <ListItemIcon><Analytics /></ListItemIcon>

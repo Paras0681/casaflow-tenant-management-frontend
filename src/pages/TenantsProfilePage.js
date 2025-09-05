@@ -59,7 +59,7 @@ const TenantsProfilePage = () => {
   // Fetch tenants
   const fetchTenants = async () => {
     try {
-      const response = await api.get("tenants/tenants-profile/");
+      const response = await api.get("/tenants/tenants-profile/");
       setTenants(response.data);
       setFilteredTenants(response.data);
       setError("");

@@ -52,6 +52,12 @@ const LoginPage = () => {
     try {
       const response = await api.post("/users/login/", form);
       const { access, refresh, user } = response.data;
+
+      // Log tokens to console
+      console.log("[LOGIN] Access Token:", access);
+      console.log("[LOGIN] Refresh Token:", refresh);
+      console.log("[LOGIN] User:", user);
+
       login(user, { access, refresh });
       navigate("/dashboard");
     } catch (err) {
@@ -71,6 +77,12 @@ const LoginPage = () => {
     try {
       const response = await api.post("/users/register/", registerForm);
       const { access, refresh, user } = response.data;
+
+      // Log tokens to console
+      console.log("[REGISTER] Access Token:", access);
+      console.log("[REGISTER] Refresh Token:", refresh);
+      console.log("[REGISTER] User:", user);
+
       login(user, { access, refresh });
       setRegisterOpen(false);
       navigate("/dashboard");

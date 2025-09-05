@@ -9,7 +9,7 @@ import {
   TextField,
   Alert,
 } from "@mui/material";
-import axios from "axios";
+import api from "../api";
 
 const RegisterButton = () => {
   const [open, setOpen] = useState(false);
@@ -39,7 +39,7 @@ const RegisterButton = () => {
         name: formData.name, // make sure your RegisterSerializer expects this
       };
 
-      const response = await axios.post("http://127.0.0.1:8000/api/register/", payload);
+      const response = await api.post("register/", payload);
 
       // Store JWT tokens in localStorage (optional but recommended)
       localStorage.setItem("access", response.data.access);

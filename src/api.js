@@ -3,15 +3,19 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000/api/",
-  timeout: 10000, // optional
 });
 
 // Request interceptor → attach token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = localStorage.getItem("access");
+    const refreshToken = localStorage.getItem("refresh");
+
+    console.log("[API REQUEST] Access Token:", accessToken);
+    console.log("[API REQUEST] Refresh Token:", refreshToken);
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -35,17 +39,21 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refresh");
+        console.log("[API REFRESH] Using Refresh Token:", refreshToken);
+
         const res = await axios.post("http://127.0.0.1:8000/api/users/refresh/", {
           refresh: refreshToken,
         });
 
+        console.log("[API REFRESH] New Access Token:", res.data.access);
+
         localStorage.setItem("access", res.data.access);
 
-        // Retry original request
+        // Retry original request with new access token
         originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
         return api(originalRequest);
       } catch (refreshErr) {
-        console.error("Refresh token expired or invalid", refreshErr);
+        console.error("[API REFRESH ERROR] Refresh token expired or invalid", refreshErr);
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
         localStorage.removeItem("user");
