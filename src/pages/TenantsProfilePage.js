@@ -158,7 +158,6 @@ const TenantsProfilePage = () => {
 
       <Tabs value={tab} onChange={handleTabChange}>
         <Tab label="View Tenants" />
-        <Tab label="Add Tenant" />
       </Tabs>
 
       {/* Tab 0: View Tenants */}
@@ -239,79 +238,6 @@ const TenantsProfilePage = () => {
             )}
           </>
         )}
-      </CustomTabPanel>
-
-      {/* Tab 1: Add tenant */}
-      <CustomTabPanel value={tab} index={1}>
-        <form onSubmit={handleSubmitNew}>
-          <Box display="flex" flexDirection="column" gap={2} maxWidth={400}>
-            <TextField
-              required
-              label="First Name"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              required
-              label="Last Name"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              required
-              label="Email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              required
-              label="Phone Number"
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Room Number"
-              name="room_number"
-              value={formData.room_number}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Lease Start Date"
-              name="lease_start_date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              value={formData.lease_start_date}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="Occupation"
-              name="occupation"
-              value={formData.occupation}
-              onChange={handleChange}
-              fullWidth
-            />
-            <Button type="submit" variant="contained">
-              Save Tenant
-            </Button>
-          </Box>
-        </form>
       </CustomTabPanel>
 
       {/* Edit Modal */}

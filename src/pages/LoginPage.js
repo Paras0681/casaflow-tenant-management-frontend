@@ -24,11 +24,18 @@ const LoginPage = () => {
 
   const [registerOpen, setRegisterOpen] = useState(false);
   const [registerForm, setRegisterForm] = useState({
+    first_name: "",
+    last_name: "",
+    occupation: "",
+    phone_number: "",
+    room_number: "",
+    address: "",
     email: "",
     password: "",
   });
   const [registerError, setRegisterError] = useState("");
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false); // NEW
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -73,22 +80,45 @@ const LoginPage = () => {
     e.preventDefault();
     setRegisterLoading(true);
     setRegisterError("");
+    setRegisterSuccess(false);
 
     try {
-      const response = await api.post("/users/register/", registerForm);
-      const { access, refresh, user } = response.data;
+      await api.post("/users/register/", registerForm);
 
-      // Log tokens to console
-      console.log("[REGISTER] Access Token:", access);
-      console.log("[REGISTER] Refresh Token:", refresh);
-      console.log("[REGISTER] User:", user);
-
-      login(user, { access, refresh });
+      // Registration successful → show alert on login page
+      setRegisterSuccess(true);
       setRegisterOpen(false);
-      navigate("/dashboard");
+
+      // Reset register form
+      setRegisterForm({
+        first_name: "",
+        last_name: "",
+        occupation: "",
+        phone_number: "",
+        room_number: "",
+        address: "",
+        email: "",
+        password: "",
+      });
+
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setRegisterSuccess(false), 5000);
+
     } catch (err) {
-      setRegisterError(err.response?.data?.detail || "Failed to register");
-      console.error("Register error:", err);
+      if (err.response?.data) {
+        const data = err.response.data;
+        const firstError =
+          data.error ||
+          data.email?.[0] ||
+          data.password?.[0] ||
+          data.first_name?.[0] ||
+          data.last_name?.[0] ||
+          data.detail ||
+          "Failed to register";
+        setRegisterError(firstError);
+      } else {
+        setRegisterError("Failed to register");
+      }
     } finally {
       setRegisterLoading(false);
     }
@@ -118,6 +148,17 @@ const LoginPage = () => {
         <Typography variant="h5" fontWeight="bold" mb={3}>
           Login
         </Typography>
+
+        {/* Show registration success alert */}
+        {registerSuccess && (
+          <Alert
+            severity="success"
+            sx={{ mb: 2 }}
+            onClose={() => setRegisterSuccess(false)}
+          >
+            Registration successful! You can now login.
+          </Alert>
+        )}
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -153,7 +194,7 @@ const LoginPage = () => {
         {/* Register button */}
         <Button
           variant="outlined"
-          color="secondary"
+          color="primary"
           fullWidth
           sx={{ mt: 2 }}
           onClick={() => setRegisterOpen(true)}
@@ -168,6 +209,60 @@ const LoginPage = () => {
         <form onSubmit={handleRegisterSubmit}>
           <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             {registerError && <Alert severity="error">{registerError}</Alert>}
+            <TextField
+              label="First Name"
+              name="first_name"
+              type="text"
+              fullWidth
+              value={registerForm.first_name}
+              onChange={handleRegisterChange}
+              required
+            />
+            <TextField
+              label="Last Name"
+              name="last_name"
+              type="text"
+              fullWidth
+              value={registerForm.last_name}
+              onChange={handleRegisterChange}
+              required
+            />
+            <TextField
+              label="Occupation"
+              name="occupation"
+              type="text"
+              fullWidth
+              value={registerForm.occupation}
+              onChange={handleRegisterChange}
+              required
+            />
+            <TextField
+              label="Phone No."
+              name="phone_number"
+              type="text"
+              fullWidth
+              value={registerForm.phone_number}
+              onChange={handleRegisterChange}
+              required
+            />
+            <TextField
+              label="Room No."
+              name="room_number"
+              type="text"
+              fullWidth
+              value={registerForm.room_number}
+              onChange={handleRegisterChange}
+              required
+            />
+            <TextField
+              label="Address"
+              name="address"
+              type="text"
+              fullWidth
+              value={registerForm.address}
+              onChange={handleRegisterChange}
+              required
+            />
             <TextField
               label="Email"
               name="email"
