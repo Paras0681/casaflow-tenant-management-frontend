@@ -11,8 +11,8 @@ api.interceptors.request.use(
     const accessToken = localStorage.getItem("access");
     const refreshToken = localStorage.getItem("refresh");
 
-    console.log("[API REQUEST] Access Token:", accessToken);
-    console.log("[API REQUEST] Refresh Token:", refreshToken);
+    // console.log("[API REQUEST] Access Token:", accessToken);
+    // console.log("[API REQUEST] Refresh Token:", refreshToken);
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;

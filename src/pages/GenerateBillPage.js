@@ -12,13 +12,12 @@ import {
   CardMedia,
   Paper,
   InputAdornment,
-  Chip,
-  Stack,
   Tabs,
   Tab,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import api from "../api"; // axios instance
+import invoice_card_img from "../images/invoice_card_img.png";
 
 const TimeDisplay = ({ isoString }) => {
   const date = new Date(isoString);
@@ -43,46 +42,48 @@ const GenerateBillPage = () => {
   const [description, setDescription] = useState("");
   const [uploadedBills, setUploadedBills] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState("All");
 
   // ---------- Receipts State ----------
-  const [receiptFile, setReceiptFile] = useState(null);
-  const [receiptError, setReceiptError] = useState("");
-  const [receiptRoom, setReceiptRoom] = useState("");
-  const [receiptDesc, setReceiptDesc] = useState("");
+  const [rent, setRent] = useState("");
+  const [light, setLight] = useState("");
+  const [other, setOther] = useState("");
+  const [total, setTotal] = useState(0);
+  const [billDate, setBillDate] = useState("");
   const [uploadedReceipts, setUploadedReceipts] = useState([]);
   const [searchReceipt, setSearchReceipt] = useState("");
-    const [rent, setRent] = useState("");
-  const [water, setWater] = useState("");
-  const [maintenance, setMaintenance] = useState("");
-  const [other, setOther] = useState("");
-  const [billDate, setBillDate] = useState("");
-  const [previewData, setPreviewData] = useState(null);
+  const [roomsList, setRoomsList] = useState([]);
+  const [receiptRoom, setReceiptRoom] = useState("");
+  const [perPerson, setPerPerson] = useState(0); 
 
-  // Handle preview
-  const handlePreview = (e) => {
-    e.preventDefault();
-    const total = Number(rent || 0) + Number(water || 0) + Number(maintenance || 0) + Number(other || 0);
-    setPreviewData({
-      rent,
-      water,
-      maintenance,
-      other,
-      billDate,
-      total,
-    });
-  };
+  // Auto calculate total
+  useEffect(() => {
+    const totalVal =
+      (parseFloat(rent) || 0) +
+      (parseFloat(light) || 0) +
+      (parseFloat(other) || 0);
+    setTotal(totalVal);
+
+    // avoid divide by zero
+    // find occupants of selected room
+    const selectedRoom = roomsList.find((room) => room.room === receiptRoom);
+    if (selectedRoom && selectedRoom.occupants > 0) {
+      setPerPerson(totalVal / selectedRoom.occupants);
+    } else {
+      setPerPerson(0);
+    }
+  }, [rent, light, other, roomsList]);
 
   // Handle PDF generation
   const handleGeneratePDF = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await api.post("/invoices/generate/", {
-        rent,
-        water,
-        maintenance,
-        other,
+      const response = await api.post("/tenants/receipts/generate/", {
+        room_number: receiptRoom,
+        rent_amount: rent,
+        lightbill_amount: light,
+        other_charges: other,
+        total_amount: total,
         bill_date: billDate,
       });
 
@@ -101,7 +102,6 @@ const GenerateBillPage = () => {
   const cleanUrl = (url) => (url ? url.replace("image/upload/", "") : "");
   const handleView = (url) => window.open(url, "_blank");
 
-  // File validation (used for both bills & receipts)
   const validateFile = (file, setError, setState, e) => {
     const fileSizeKB = file.size / 1024;
     const validTypes = ["application/pdf", "image/jpeg", "image/png"];
@@ -141,7 +141,10 @@ const GenerateBillPage = () => {
     const fetchReceipts = async () => {
       try {
         const response = await api.get("/tenants/receipts/");
-        setUploadedReceipts(response.data);
+        const rooms_list = response.data["rooms"]
+        setRoomsList(rooms_list || []);
+        const receipts = response.data["receipts"]
+        setUploadedReceipts(receipts);
       } catch (error) {
         console.error("Error fetching receipts:", error);
       }
@@ -180,33 +183,6 @@ const GenerateBillPage = () => {
     }
   };
 
-  // ---------- Submit Receipt ----------
-  const handleReceiptSubmit = async (e) => {
-    e.preventDefault();
-    if (!receiptFile || !receiptRoom) {
-      alert("Please fill required fields and upload a file!");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", receiptFile);
-    formData.append("room_number", receiptRoom);
-    if (receiptDesc) formData.append("description", receiptDesc);
-
-    try {
-      const response = await api.post("/tenants/receipts/upload/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setUploadedReceipts((prev) => [...prev, response.data]);
-      alert("Receipt uploaded successfully!");
-      setReceiptFile(null);
-      setReceiptRoom("");
-      setReceiptDesc("");
-    } catch (error) {
-      console.error(error);
-      alert("Error uploading receipt.");
-    }
-  };
-
   // ---------- Delete ----------
   const handleDeleteBill = async (id) => {
     if (!window.confirm("Delete this bill?")) return;
@@ -241,7 +217,7 @@ const GenerateBillPage = () => {
   const filteredReceipts = uploadedReceipts.filter((r) => {
     const q = searchReceipt.toLowerCase();
     return (
-      (r.description && r.description.toLowerCase().includes(q)) ||
+      (r.payment_status && r.payment_status.toLowerCase().includes(q)) ||
       (r.room_number && String(r.room_number).includes(q))
     );
   });
@@ -262,22 +238,24 @@ const GenerateBillPage = () => {
       {tabIndex === 0 && (
         <>
           {/* Upload Bill Form */}
-          <Paper elevation={4} sx={{p: 3,mb: 4,maxWidth: "500px",mx: "auto",borderRadius: "12px",}}>
+          <Paper elevation={4} sx={{ p: 3, mb: 4, maxWidth: "500px", mx: "auto", borderRadius: "12px" }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>
               Upload New Bill
             </Typography>
-            <Box
-              component="form"
-              onSubmit={handleBillSubmit}
-              sx={{ display: "grid", gap: 2 }}
-            >
+            <Box component="form" onSubmit={handleBillSubmit} sx={{ display: "grid", gap: 2 }}>
               <TextField
+                select
                 label="Room Number"
-                type="number"
                 value={roomNumber}
                 onChange={(e) => setRoomNumber(e.target.value)}
                 required
-              />
+              >
+                {roomsList.map((room_no) => (
+                  <MenuItem key={room_no.room} value={room_no.room}>
+                  {room_no.room}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 select
                 label="Bill Type"
@@ -319,11 +297,7 @@ const GenerateBillPage = () => {
                   {fileError}
                 </Typography>
               )}
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={!billFile || !!fileError}
-              >
+              <Button variant="contained" type="submit" disabled={!billFile || !!fileError}>
                 Upload
               </Button>
             </Box>
@@ -343,13 +317,7 @@ const GenerateBillPage = () => {
               ),
             }}
           />
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-              gap: 3,
-            }}
-          >
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 3 }}>
             {filteredBills.map((bill) => (
               <Card key={bill.id}>
                 {bill.file?.endsWith(".pdf") ? (
@@ -362,11 +330,7 @@ const GenerateBillPage = () => {
                     </a>
                   </CardContent>
                 ) : (
-                  <CardMedia
-                    component="img"
-                    height="150"
-                    image={cleanUrl(bill.file)}
-                  />
+                  <CardMedia component="img" height="150" image={cleanUrl(bill.file)} />
                 )}
                 <CardContent>
                   <Typography>Room: {bill.room_number}</Typography>
@@ -378,10 +342,7 @@ const GenerateBillPage = () => {
                     <Button onClick={() => handleView(cleanUrl(bill.file))}>
                       View
                     </Button>
-                    <Button
-                      color="error"
-                      onClick={() => handleDeleteBill(bill.id)}
-                    >
+                    <Button color="error" onClick={() => handleDeleteBill(bill.id)}>
                       Delete
                     </Button>
                   </Box>
@@ -395,24 +356,26 @@ const GenerateBillPage = () => {
       {/* ---------- Receipts Tab ---------- */}
       {tabIndex === 1 && (
         <>
-          {/* Upload Receipt Form */}
-          <Paper
-            elevation={4}
-            sx={{
-              p: 3,
-              maxWidth: "500px",
-              mx: "auto",
-              borderRadius: "12px",
-            }}
-          >
+          {/* Receipt Form */}
+          <Paper elevation={4} sx={{ p: 3, maxWidth: "500px", mx: "auto", borderRadius: "12px" }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>
               Generate Receipt
             </Typography>
-
-            <Box
-              component="form"
-              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-            >
+            <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField
+                select
+                label="Select Room"
+                value={receiptRoom}
+                onChange={(e) => setReceiptRoom(e.target.value)}
+                required
+                fullWidth
+              >
+                {roomsList.map((room_no) => (
+                  <MenuItem key={room_no.room} value={room_no.room}>
+                  {room_no.room}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 label="Rent Amount"
                 type="number"
@@ -422,19 +385,10 @@ const GenerateBillPage = () => {
                 fullWidth
               />
               <TextField
-                label="Water Bill Amount"
+                label="Light Bill Amount"
                 type="number"
-                value={water}
-                onChange={(e) => setWater(e.target.value)}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Maintenance Amount"
-                type="number"
-                value={maintenance}
-                onChange={(e) => setMaintenance(e.target.value)}
-                required
+                value={light}
+                onChange={(e) => setLight(e.target.value)}
                 fullWidth
               />
               <TextField
@@ -442,6 +396,20 @@ const GenerateBillPage = () => {
                 type="number"
                 value={other}
                 onChange={(e) => setOther(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label="Total Amount"
+                type="number"
+                value={total}
+                disabled
+                fullWidth
+              />
+              <TextField
+                label="Per Person Share"
+                type="number"
+                value={perPerson}
+                disabled
                 fullWidth
               />
               <TextField
@@ -453,45 +421,10 @@ const GenerateBillPage = () => {
                 required
                 fullWidth
               />
-
-              <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  fullWidth
-                  onClick={handlePreview}
-                >
-                  Preview
-                </Button>
-                <Button
-                  variant="contained"
-                  color="success"
-                  fullWidth
-                  onClick={handleGeneratePDF}
-                >
-                  Generate PDF
-                </Button>
-              </Box>
+              <Button variant="contained" color="success" fullWidth onClick={handleGeneratePDF}>
+                Generate Invoices
+              </Button>
             </Box>
-
-            {/* Preview Section */}
-            {previewData && (
-              <Paper
-                variant="outlined"
-                sx={{ mt: 3, p: 2, borderRadius: "8px", background: "#fafafa" }}
-              >
-                <Typography variant="subtitle1" fontWeight="bold">
-                  Receipt Preview ({previewData.billDate})
-                </Typography>
-                <Typography variant="body2">Rent: ₹{previewData.rent}</Typography>
-                <Typography variant="body2">Water: ₹{previewData.water}</Typography>
-                <Typography variant="body2">Maintenance: ₹{previewData.maintenance}</Typography>
-                <Typography variant="body2">Other: ₹{previewData.other}</Typography>
-                <Typography variant="h6" mt={1}>
-                  Total: ₹{previewData.total}
-                </Typography>
-              </Paper>
-            )}
           </Paper>
 
           {/* Receipts List */}
@@ -499,7 +432,7 @@ const GenerateBillPage = () => {
             placeholder="Search receipts..."
             value={searchReceipt}
             onChange={(e) => setSearchReceipt(e.target.value)}
-            sx={{ mb: 3 }}
+            sx={{ mb: 3, mt: 3 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -508,13 +441,7 @@ const GenerateBillPage = () => {
               ),
             }}
           />
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-              gap: 3,
-            }}
-          >
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 3 }}>
             {filteredReceipts.map((r) => (
               <Card key={r.id}>
                 {r.file?.endsWith(".pdf") ? (
@@ -527,26 +454,15 @@ const GenerateBillPage = () => {
                     </a>
                   </CardContent>
                 ) : (
-                  <CardMedia
-                    component="img"
-                    height="150"
-                    image={cleanUrl(r.file)}
-                  />
+                  <CardMedia component="img" height="150" image={invoice_card_img} />
                 )}
                 <CardContent>
-                  <Typography>Room: {r.room_number}</Typography>
-                  <Typography>Description: {r.description || "N/A"}</Typography>
-                  <Typography>
-                    Time: <TimeDisplay isoString={r.uploaded_at} />
-                  </Typography>
+                  <Typography>Name: {r.tenant_name}</Typography>
+                  <Typography>Payment Status: {r.payment_status.toUpperCase()}</Typography>
+                  <Typography>Amount: {r.total_amount}</Typography>
                   <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                    <Button onClick={() => handleView(cleanUrl(r.file))}>
-                      View
-                    </Button>
-                    <Button
-                      color="error"
-                      onClick={() => handleDeleteReceipt(r.id)}
-                    >
+                    <Button onClick={() => handleView(cleanUrl(r.file))}>View</Button>
+                    <Button color="error" onClick={() => handleDeleteReceipt(r.id)}>
                       Delete
                     </Button>
                   </Box>
