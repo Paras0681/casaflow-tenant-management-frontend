@@ -156,9 +156,9 @@ const TenantsProfilePage = () => {
       {success && <Alert severity="success">Operation successful!</Alert>}
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Tabs value={tab} onChange={handleTabChange}>
+      {/* <Tabs value={tab} onChange={handleTabChange}>
         <Tab label="View Tenants" />
-      </Tabs>
+      </Tabs> */}
 
       {/* Tab 0: View Tenants */}
       <CustomTabPanel value={tab} index={0}>

@@ -87,6 +87,8 @@ const GenerateBillPage = () => {
         bill_date: billDate,
       });
 
+      console.log("Hoorraayyyy: ", response.data)
+
       if (response.data.pdf_url) {
         window.open(response.data.pdf_url, "_blank");
       } else {
@@ -359,7 +361,7 @@ const GenerateBillPage = () => {
           {/* Receipt Form */}
           <Paper elevation={4} sx={{ p: 3, maxWidth: "500px", mx: "auto", borderRadius: "12px" }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-              Generate Receipt
+              Generate Invoice PDF's
             </Typography>
             <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <TextField
@@ -413,7 +415,7 @@ const GenerateBillPage = () => {
                 fullWidth
               />
               <TextField
-                label="Bill Date"
+                label="Invoice Date"
                 type="date"
                 InputLabelProps={{ shrink: true }}
                 value={billDate}

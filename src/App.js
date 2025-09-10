@@ -10,6 +10,7 @@ import GenerateBillPage from "./pages/GenerateBillPage";
 import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import DocumentUploadPage from "./pages/DocumentUploadPage";
+import PropertiesPage from "./pages/PropertiesPage"
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -43,6 +44,9 @@ function App() {
               } />
               <Route path="/tenants-profile" element={
                 <ProtectedRoute><TenantsProfilePage /></ProtectedRoute>
+              } />
+              <Route path="/properties" element={
+                <ProtectedRoute><PropertiesPage /></ProtectedRoute>
               } />
             </Routes>
           </AuthProvider>

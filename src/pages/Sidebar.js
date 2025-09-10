@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Dashboard, People, Analytics, CurrencyRupee, Logout } from "@mui/icons-material";
+import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../images/casaflow_logo.png";
@@ -26,13 +27,6 @@ const Sidebar = () => {
         src={logo}
         alt="Page Banner"
         sx={{ width: 90, height: "auto", mb: 3 }}
-        // sx={{
-        //   width: "100%",
-        //   maxHeight: 300,
-        //   objectFit: "cover",
-        //   borderRadius: 2,
-        //   mb: 3,
-        // }}
       />
       </Box>
       <List>
@@ -51,6 +45,10 @@ const Sidebar = () => {
         <ListItemButton onClick={() => handleNavigation("/tenants-profile")}>
           <ListItemIcon><People /></ListItemIcon>
           <ListItemText primary="Tenants" />
+        </ListItemButton>
+        <ListItemButton onClick={() => handleNavigation("/properties")}>
+          <ListItemIcon><MapsHomeWorkIcon /></ListItemIcon>
+        <ListItemText primary="Properties" />
         </ListItemButton>
         <ListItemButton onClick={handleLogout}>
           <ListItemIcon><Logout /></ListItemIcon>
