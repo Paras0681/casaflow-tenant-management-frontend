@@ -85,18 +85,12 @@ const GenerateBillPage = () => {
         other_charges: other,
         total_amount: total,
         bill_date: billDate,
+        per_tenant_share: perPerson
       });
 
-      console.log("Hoorraayyyy: ", response.data)
-
-      if (response.data.pdf_url) {
-        window.open(response.data.pdf_url, "_blank");
-      } else {
-        alert("PDF generated but no URL received.");
-      }
     } catch (error) {
       console.error("Error generating receipt:", error);
-      alert("Failed to generate PDF.");
+      alert("Failed to generate receipt.");
     }
   };
 
@@ -104,11 +98,11 @@ const GenerateBillPage = () => {
   const cleanUrl = (url) => (url ? url.replace("image/upload/", "") : "");
   const handleView = (url) => window.open(url, "_blank");
 
-  const validateFile = (file, setError, setState, e) => {
-    const fileSizeKB = file.size / 1024;
+  const validateFile = (file_url, setError, setState, e) => {
+    const fileSizeKB = file_url.size / 1024;
     const validTypes = ["application/pdf", "image/jpeg", "image/png"];
 
-    if (!validTypes.includes(file.type)) {
+    if (!validTypes.includes(file_url.type)) {
       setError("Only PDF, JPG, and PNG files are allowed.");
       setState(null);
       e.target.value = "";
@@ -121,7 +115,7 @@ const GenerateBillPage = () => {
       return false;
     }
     setError("");
-    setState(file);
+    setState(file_url);
     return true;
   };
 
@@ -158,11 +152,11 @@ const GenerateBillPage = () => {
   const handleBillSubmit = async (e) => {
     e.preventDefault();
     if (!billType || !billFile || !roomNumber) {
-      alert("Please fill required fields and upload a file!");
+      alert("Please fill required fields and upload a file_url!");
       return;
     }
     const formData = new FormData();
-    formData.append("file", billFile);
+    formData.append("file_url", billFile);
     formData.append("file_type", billType.toLowerCase());
     formData.append("room_number", roomNumber);
     if (unitReading) formData.append("unit_reading", unitReading);
@@ -286,7 +280,7 @@ const GenerateBillPage = () => {
               <Button variant="contained" component="label">
                 {billFile ? billFile.name : "Choose File"}
                 <input
-                  type="file"
+                  type="file_url"
                   hidden
                   accept=".pdf,.jpg,.png,.jpeg"
                   onChange={(e) =>
@@ -322,18 +316,7 @@ const GenerateBillPage = () => {
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 3 }}>
             {filteredBills.map((bill) => (
               <Card key={bill.id}>
-                {bill.file?.endsWith(".pdf") ? (
-                  <CardContent>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {bill.file_type.toUpperCase()}
-                    </Typography>
-                    <a href={cleanUrl(bill.file)} target="_blank">
-                      View PDF
-                    </a>
-                  </CardContent>
-                ) : (
-                  <CardMedia component="img" height="150" image={cleanUrl(bill.file)} />
-                )}
+                  <CardMedia component="img" height="150" image={cleanUrl(bill.file_url)} />
                 <CardContent>
                   <Typography>Room: {bill.room_number}</Typography>
                   <Typography>Description: {bill.description || "N/A"}</Typography>
@@ -341,7 +324,7 @@ const GenerateBillPage = () => {
                     Time: <TimeDisplay isoString={bill.uploaded_at} />
                   </Typography>
                   <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                    <Button onClick={() => handleView(cleanUrl(bill.file))}>
+                    <Button onClick={() => handleView(cleanUrl(bill.file_url))}>
                       View
                     </Button>
                     <Button color="error" onClick={() => handleDeleteBill(bill.id)}>
@@ -446,12 +429,12 @@ const GenerateBillPage = () => {
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 3 }}>
             {filteredReceipts.map((r) => (
               <Card key={r.id}>
-                {r.file?.endsWith(".pdf") ? (
+                {r.file_url?.endsWith(".pdf") ? (
                   <CardContent>
                     <Typography variant="subtitle1" fontWeight="bold">
                       RECEIPT
                     </Typography>
-                    <a href={cleanUrl(r.file)} target="_blank">
+                    <a href={cleanUrl(r.file_url)} target="_blank">
                       View PDF
                     </a>
                   </CardContent>
@@ -463,7 +446,7 @@ const GenerateBillPage = () => {
                   <Typography>Payment Status: {r.payment_status.toUpperCase()}</Typography>
                   <Typography>Amount: {r.total_amount}</Typography>
                   <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                    <Button onClick={() => handleView(cleanUrl(r.file))}>View</Button>
+                    <Button onClick={() => handleView(cleanUrl(r.file_url))}>View</Button>
                     <Button color="error" onClick={() => handleDeleteReceipt(r.id)}>
                       Delete
                     </Button>
