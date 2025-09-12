@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Dashboard, People, Analytics, CurrencyRupee, Logout } from "@mui/icons-material";
+import PaymentsIcon from '@mui/icons-material/Payments';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -37,6 +38,10 @@ const Sidebar = () => {
         <ListItemButton onClick={() => handleNavigation("/bills")}>
           <ListItemIcon><CurrencyRupee /></ListItemIcon>
           <ListItemText primary="Invoice" />
+        </ListItemButton>
+        <ListItemButton onClick={() => handleNavigation("/payments")}>
+          <ListItemIcon><PaymentsIcon /></ListItemIcon>
+        <ListItemText primary="Payments" />
         </ListItemButton>
         <ListItemButton onClick={() => handleNavigation("/analytics")}>
           <ListItemIcon><Analytics /></ListItemIcon>

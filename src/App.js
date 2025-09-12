@@ -11,6 +11,7 @@ import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import DocumentUploadPage from "./pages/DocumentUploadPage";
 import PropertiesPage from "./pages/PropertiesPage"
+import PaymentPage from "./pages/PaymentPage";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -47,6 +48,9 @@ function App() {
               } />
               <Route path="/properties" element={
                 <ProtectedRoute><PropertiesPage /></ProtectedRoute>
+              } />
+              <Route path="/payments" element={
+                <ProtectedRoute><PaymentPage /></ProtectedRoute>
               } />
             </Routes>
           </AuthProvider>

@@ -219,15 +219,15 @@ const GenerateBillPage = () => {
   });
 
   return (
-    <PageWrapper pageTitle="Bills & Receipts">
+    <PageWrapper pageTitle="Uploads & Invoices">
       {/* Tabs */}
       <Tabs
         value={tabIndex}
         onChange={(e, newValue) => setTabIndex(newValue)}
         sx={{ mb: 3 }}
       >
-        <Tab label="Bills" />
-        <Tab label="Receipts" />
+        <Tab label="Uploads" />
+        <Tab label="Invoices" />
       </Tabs>
 
       {/* ---------- Bills Tab ---------- */}
@@ -236,7 +236,7 @@ const GenerateBillPage = () => {
           {/* Upload Bill Form */}
           <Paper elevation={4} sx={{ p: 3, mb: 4, maxWidth: "500px", mx: "auto", borderRadius: "12px" }}>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-              Upload New Bill
+              Upload a file
             </Typography>
             <Box component="form" onSubmit={handleBillSubmit} sx={{ display: "grid", gap: 2 }}>
               <TextField
