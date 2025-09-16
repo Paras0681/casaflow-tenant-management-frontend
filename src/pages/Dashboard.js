@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Paper, Grid, Box } from "@mui/material";
 import { People, Apartment, CurrencyRupee, Payment } from "@mui/icons-material";
-import PageWrapper from "./PageWrapper";
+import PageWrapper from "../components/PageWrapper";
 
 // Stats data
 const statsData = [

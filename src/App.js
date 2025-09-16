@@ -9,7 +9,6 @@ import Dashboard from "./pages/Dashboard";
 import GenerateBillPage from "./pages/GenerateBillPage";
 import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import DocumentUploadPage from "./pages/DocumentUploadPage";
 import PropertiesPage from "./pages/PropertiesPage"
 import PaymentPage from "./pages/PaymentPage";
 
@@ -36,9 +35,6 @@ function App() {
               } />
               <Route path="/bills" element={
                 <ProtectedRoute><GenerateBillPage /></ProtectedRoute>
-              } />
-              <Route path="/tenant-docs" element={
-                <ProtectedRoute><DocumentUploadPage /></ProtectedRoute>
               } />
               <Route path="/analytics" element={
                 <ProtectedRoute><AnalyticsPage /></ProtectedRoute>

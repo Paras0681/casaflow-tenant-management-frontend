@@ -1,62 +1,78 @@
-import React, { useState } from "react";
-import PageWrapper from "../pages/PageWrapper";
+import React, { useState, useEffect } from "react";
+import PageWrapper from "../components/PageWrapper";
 import {
   Box,
-  TextField,
-  Button,
   Typography,
-  Card,
-  CardContent,
   Paper,
+  TextField,
   InputAdornment,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Alert,
+  Pagination,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import api from "../api"; // axios instance
+import api from "../api";
+import FormComponent from "../components/FormComponent";
+
+// Define payment form fields
+const paymentFormConfig = [
+  { name: "invoice_id", label: "Invoice ID", type: "text", required: true },
+  { name: "payment_id", label: "Payment ID", type: "text", required: true },
+  { name: "payment_utr", label: "Payment UTR", type: "text", required: true },
+  { name: "amount", label: "Amount", type: "number", required: true },
+  { name: "paid_at", label: "Date", type: "date", required: true },
+  {
+    name: "screenshot",
+    label: "Payment Screenshot",
+    type: "file",
+    required: true,
+    allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
+    sizeRangeKB: [30, 100],
+  },
+];
+
+const initialFormValues = {
+  invoice_id: "",
+  payment_id: "",
+  payment_utr: "",
+  amount: "",
+  paid_at: "",
+  screenshot: null,
+};
+
+const ITEMS_PER_PAGE = 10;
 
 const PaymentsPage = () => {
-  const [invoiceId, setInvoiceId] = useState("");
-  const [paymentId, setPaymentId] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [screenshot, setScreenshot] = useState(null);
   const [payments, setPayments] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [formValues, setFormValues] = useState(initialFormValues);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("invoice_id", invoiceId);
-    formData.append("payment_id", paymentId);
-    formData.append("amount", amount);
-    formData.append("paid_at", date);
-    if (screenshot) {
-        formData.append("screenshot", screenshot);
-    }
-
-    try {
-        const response = await api.post("/payments/mark-payments/", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-        });
-
-        if (response.status === 201 || response.status === 200) {
-        setPayments((prev) => [...prev, response.data]);
-        alert("Payment submitted successfully!");
-        setInvoiceId("");
-        setPaymentId("");
-        setAmount("");
-        setDate("");
-        setScreenshot(null);
-        } else {
-        alert("Error submitting payment.");
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const response = await api.get("/payments/get-payments");
+        if (response.status === 200) {
+          setPayments(response.data);
         }
-    } catch (error) {
-        console.error(error);
-        alert("Something went wrong.");
-    }
+      } catch (error) {
+        console.error("Failed to fetch payments:", error);
+      }
     };
+    fetchPayments();
+  }, []);
+
+  const handlePaymentSuccess = (newPayment) => {
+    setPayments((prev) => [...prev, newPayment]);
+    setFormValues(initialFormValues);
+    setCurrentPage(1);
+  };
 
   const handleView = (url) => window.open(url, "_blank");
 
@@ -64,87 +80,128 @@ const PaymentsPage = () => {
     const q = searchQuery.toLowerCase();
     return (
       (p.invoice_id && p.invoice_id.toLowerCase().includes(q)) ||
-      (p.payment_id && p.payment_id.toLowerCase().includes(q))
+      (p.payment_id && p.payment_id.toLowerCase().includes(q)) ||
+      (p.payment_utr && p.payment_utr.toLowerCase().includes(q))
     );
   });
 
+  const pageCount = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
+
+  const paginatedPayments = filteredPayments.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
     <PageWrapper pageTitle="Payments">
-      {/* Upload Payment Form */}
-      <Paper elevation={4} sx={{ p: 3, mb: 4, maxWidth: "500px", mx: "auto", borderRadius: "12px" }}>
+      <Paper
+        elevation={4}
+        sx={{ p: 3, mb: 4, maxWidth: 500, mx: "auto", borderRadius: "12px" }}
+      >
         <Typography variant="h6" fontWeight="bold" mb={2}>
           Mark a Payment
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gap: 2 }}>
-          <TextField
-            label="Invoice ID"
-            value={invoiceId}
-            onChange={(e) => setInvoiceId(e.target.value)}
-            required
-            fullWidth
-          />
-          <TextField
-            label="Payment ID"
-            value={paymentId}
-            onChange={(e) => setPaymentId(e.target.value)}
-            required
-            fullWidth
-          />
-          <TextField
-            label="Amount"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-            fullWidth
-          />
-          <TextField
-            label="Date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            required
-            fullWidth
-          />
-          <Button variant="outlined" component="label">
-            {screenshot ? screenshot.name : "Upload Screenshot"}
-            <input type="file" hidden accept="image/*" onChange={(e) => setScreenshot(e.target.files[0])} />
-          </Button>
-          <Button variant="contained" type="submit">
-            Submit Payment
-          </Button>
-        </Box>
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" fontWeight="bold">
+            Please read before uploading:
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <b>• Paste the correct Invoice ID from invoice PDF.</b>
+            <br />
+            <b>• Payment UTR is the 12 digit code in successful transaction.</b>
+            <br />
+            • Only JPG, PNG, PDF files are allowed.
+            <br />
+            • File size must be between <b>50KB and 100KB</b>.
+            <br />
+            • Ensure the document is clear and not blurry.
+          </Typography>
+        </Alert>
+
+        <FormComponent
+          formConfig={paymentFormConfig}
+          apiUrl="/payments/mark-payments/"
+          formValues={formValues}
+          setFormValues={setFormValues}
+          submitLabel="Submit Payment"
+          onSuccess={handlePaymentSuccess}
+        />
       </Paper>
 
-      {/* Payments List */}
-      <TextField
-        placeholder="Search payments..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{ mb: 3 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 3 }}>
-        {filteredPayments.map((p) => (
-          <Card key={p.id}>
-            <CardContent>
-              <Typography>Invoice ID: {p.invoice_id}</Typography>
-              <Typography>Payment ID: {p.payment_id}</Typography>
-              <Typography>Amount: {p.amount}</Typography>
-              <Typography>Paid Date: {p.paid_at}</Typography>
-              {p.screenshot && (
-                <Button onClick={() => handleView(p.screenshot)}>View Screenshot</Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+      <Box sx={{ maxWidth: 500, mx: "auto" }}>
+        <TextField
+          placeholder="Search payments..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1); // reset page on search change
+          }}
+          fullWidth
+          sx={{ mb: 2 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {pageCount > 1 && (
+          <Pagination
+            count={pageCount}
+            page={currentPage}
+            onChange={handlePageChange}
+            sx={{ mb: 2, display: "flex", justifyContent: "center" }}
+          />
+        )}
+      </Box>
+
+      <Box sx={{ maxWidth: "100%", overflowX: "auto", maxWidth: 900, mx: "auto" }}>
+        <TableContainer component={Paper}>
+          <Table aria-label="payments table" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Invoice ID</TableCell>
+                <TableCell>Payment ID</TableCell>
+                <TableCell>Payment UTR</TableCell>
+                <TableCell>Uploaded By</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell>Paid Date</TableCell>
+                <TableCell>Screenshot</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedPayments.map((p) => (
+                <TableRow key={p.id} hover>
+                  <TableCell>{p.invoice_id}</TableCell>
+                  <TableCell>{p.payment_id}</TableCell>
+                  <TableCell>{p.payment_utr}</TableCell>
+                  <TableCell>{p.uploaded_by}</TableCell>
+                  <TableCell>₹{p.amount}</TableCell>
+                  <TableCell>{p.paid_at}</TableCell>
+                  <TableCell>
+                    {p.payment_receipt_url ? (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleView(p.payment_receipt_url)}
+                      >
+                        View
+                      </Button>
+                    ) : (
+                      "N/A"
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </PageWrapper>
   );

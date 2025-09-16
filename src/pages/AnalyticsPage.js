@@ -1,6 +1,6 @@
 // src/pages/AnalyticsPage.js
 import React from "react";
-import PageWrapper from "../pages/PageWrapper";
+import PageWrapper from "../components/PageWrapper";
 import { Grid, Card, CardContent, Typography } from "@mui/material";
 
 const AnalyticsPage = () => {

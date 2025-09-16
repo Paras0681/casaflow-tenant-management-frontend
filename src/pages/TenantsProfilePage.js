@@ -1,6 +1,6 @@
 // src/pages/TenantsProfilePage.js
 import React, { useEffect, useState } from "react";
-import PageWrapper from "./PageWrapper";
+import PageWrapper from "../components/PageWrapper";
 import {
   Alert,
   Grid,
