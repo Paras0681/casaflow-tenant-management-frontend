@@ -204,8 +204,8 @@ const FormComponent = ({
               key={name}
               label={label}
               type={type}
-              value={formValues[name] || ""}
-              onChange={(e) => handleChange(name, e.target.value)}
+              value={rest.value !== undefined ? rest.value : (formValues[name] ?? "")}
+              onChange={disabled? undefined: (e) => handleChange(name, e.target.value)}
               required={required}
               error={!!formErrors[name]}
               helperText={formErrors[name]}

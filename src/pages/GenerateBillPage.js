@@ -64,27 +64,35 @@ const GenerateBillPage = () => {
     unit_reading: "",
     description: "",
     file_url: null,
-    rent: "",
-    light: "",
-    other: "",
+    rent_amount: "",
+    lightbill_amount: "",
+    other_charges: "",
+    total_amount: "",
+    per_person: "",
     bill_date: "",
   });
 
   useEffect(() => {
-    const rentVal = parseFloat(formValues.rent) || 0;
-    const lightVal = parseFloat(formValues.light) || 0;
-    const otherVal = parseFloat(formValues.other) || 0;
+    const rentVal = parseFloat(formValues.rent_amount) || 0;
+    const lightVal = parseFloat(formValues.lightbill_amount) || 0;
+    const otherVal = parseFloat(formValues.other_charges) || 0;
     const totalVal = rentVal + lightVal + otherVal;
 
-    const selectedRoom = roomsList.find((room) => room.room === formValues.room_number);
-    const perPersonVal = selectedRoom && selectedRoom.occupants > 0 ? totalVal / selectedRoom.occupants : 0;
+    let perPersonVal = 0;
+    if (formValues.room_number) {
+      const selectedRoom = roomsList.find((room) => room.room === formValues.room_number);
+      if (selectedRoom && selectedRoom.occupants > 0) {
+        perPersonVal = totalVal / selectedRoom.occupants;
+      }
+    }
 
     setFormValues((prev) => ({
       ...prev,
-      total: totalVal,
+      total_amount: totalVal,
       per_person: perPersonVal,
     }));
-  }, [formValues.rent, formValues.light, formValues.other, formValues.room_number, roomsList]);
+  }, [formValues.rent_amount, formValues.lightbill_amount, formValues.other_charges, formValues.room_number, roomsList]);
+
 
   // Fetch bills
   useEffect(() => {
@@ -168,27 +176,27 @@ const GenerateBillPage = () => {
       options: roomsList.map((r) => ({ value: r.room, label: r.room })),
     },
     {
-      name: "rent",
+      name: "rent_amount",
       label: "Rent Amount",
       type: "number",
       required: true,
     },
     {
-      name: "light",
+      name: "lightbill_amount",
       label: "Light Bill Amount",
       type: "number",
     },
     {
-      name: "other",
+      name: "other_charges",
       label: "Other Amount",
       type: "number",
     },
     {
-      name: "total",
+      name: "total_amount",
       label: "Total Amount",
       type: "number",
       disabled: true,
-      defaultValue: formValues.total,
+      defaultValue: formValues.total_amount,
     },
     {
       name: "per_person",
