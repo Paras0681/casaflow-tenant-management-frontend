@@ -9,6 +9,7 @@ import {
   TextField,
   InputAdornment,
   Pagination,
+  Button
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PageWrapper from "../components/PageWrapper.js";
@@ -68,7 +69,7 @@ const GenerateBillPage = () => {
     lightbill_amount: "",
     other_charges: "",
     total_amount: "",
-    per_person: "",
+    per_tenant_share: "",
     bill_date: "",
   });
 
@@ -89,7 +90,7 @@ const GenerateBillPage = () => {
     setFormValues((prev) => ({
       ...prev,
       total_amount: totalVal,
-      per_person: perPersonVal,
+      per_tenant_share: perPersonVal,
     }));
   }, [formValues.rent_amount, formValues.lightbill_amount, formValues.other_charges, formValues.room_number, roomsList]);
 
@@ -199,11 +200,11 @@ const GenerateBillPage = () => {
       defaultValue: formValues.total_amount,
     },
     {
-      name: "per_person",
+      name: "per_tenant_share",
       label: "Per Person Share",
       type: "number",
       disabled: true,
-      defaultValue: formValues.per_person,
+      defaultValue: formValues.per_tenant_share,
     },
     {
       name: "bill_date",
@@ -254,6 +255,27 @@ const GenerateBillPage = () => {
   const handleReceiptsPageChange = (event, value) => {
     setReceiptsPage(value);
   };
+
+  const handleMarkPaid = async (invoice) => {
+    try {
+      const response = await api.post("/tenants/mark-invoice/", {
+        invoice_id: invoice.invoice_id,
+      });
+
+      if (response.status === 200) {
+        setUploadedReceipts((prev) =>
+          prev.map((r) =>
+            r.id === invoice.id ? { ...r, payment_status: "paid" } : r
+          )
+        );
+        alert("Invoice marked as paid!");
+      }
+    } catch (error) {
+      console.error("Error marking invoice as paid:", error);
+      alert("Failed to mark invoice as paid.");
+    }
+  };
+
 
   return (
     <PageWrapper pageTitle="Uploads & Invoices">
@@ -393,15 +415,39 @@ const GenerateBillPage = () => {
               }}
             >
               {paginatedReceipts.map((r) => (
-                <DisplayCard
+                <Paper
                   key={r.id}
-                  file={r}
-                  fields={[
-                    { key: "tenant_name", label: "Name" },
-                    { key: "payment_status", label: "Payment Status", fn: (val) => val?.toUpperCase() ?? "N/A" },
-                    { key: "total_amount", label: "Amount" },
-                  ]}
-                />
+                  sx={{
+                    p: 2,
+                    position: "relative",
+                    "&:hover .actions": { display: "flex" },
+                  }}
+                  elevation={3}
+                >
+                  <Typography><b>Name:</b> {r.tenant_name}</Typography>
+                  <Typography><b>Invoice Id:</b> {r.invoice_id}</Typography>
+                  <Typography><b>Payment Status:</b> {r.payment_status?.toUpperCase()}</Typography>
+                  <Typography><b>Amount:</b> {r.per_tenant_share}</Typography>
+                  <Box className="actions" sx={{ display: "none", gap: 1, mt: 1 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={() => window.open(r.invoice_url, "_blank")}
+                    >
+                      View
+                    </Button>
+                    {r.payment_status !== "paid" && (
+                      <Button
+                        size="small"
+                        color="success"
+                        variant="contained"
+                        onClick={() => handleMarkPaid(r)}
+                      >
+                        Mark Paid
+                      </Button>
+                    )}
+                  </Box>
+                </Paper>
               ))}
             </Box>
 
