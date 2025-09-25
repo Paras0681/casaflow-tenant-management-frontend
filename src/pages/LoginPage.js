@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import {
   Box,
   TextField,
+  FormHelperText,
   Button,
   Paper,
   Typography,
@@ -45,6 +46,10 @@ const LoginPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
   // Handle register input
   const handleRegisterChange = (e) => {
     setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
@@ -59,11 +64,6 @@ const LoginPage = () => {
     try {
       const response = await api.post("/users/login/", form);
       const { access, refresh, user } = response.data;
-
-      // Log tokens to console
-      console.log("[LOGIN] Access Token:", access);
-      console.log("[LOGIN] Refresh Token:", refresh);
-      console.log("[LOGIN] User:", user);
 
       login(user, { access, refresh });
       navigate("/dashboard");
@@ -201,6 +201,17 @@ const LoginPage = () => {
         >
           Register
         </Button>
+
+        {/* Forgot and Reset Password links */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+          <Button
+            variant="text"
+            onClick={() => navigate("/forgot-password")}
+            sx={{ textTransform: "none", p: 0 }}
+          >
+            Forgot Password?
+          </Button>
+        </Box>
       </Paper>
 
       {/* Register modal */}
@@ -239,12 +250,53 @@ const LoginPage = () => {
             <TextField
               label="Phone No."
               name="phone_number"
-              type="text"
+              type="tel"
               fullWidth
               value={registerForm.phone_number}
-              onChange={handleRegisterChange}
+              onChange={(e) => {
+                // Allow only digits
+                const onlyDigits = e.target.value.replace(/\D/g, "");
+                setRegisterForm({ ...registerForm, phone_number: onlyDigits });
+              }}
+              inputProps={{ maxLength: 10 }}
               required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor:
+                      registerForm.phone_number === ""
+                        ? "default"
+                        : registerForm.phone_number.length === 10
+                        ? "green"
+                        : "red",
+                  },
+                  "&:hover fieldset": {
+                    borderColor:
+                      registerForm.phone_number === ""
+                        ? "default"
+                        : registerForm.phone_number.length === 10
+                        ? "green"
+                        : "red",
+                  },
+                },
+              }}
             />
+            <FormHelperText
+              sx={{
+                color:
+                  registerForm.phone_number === ""
+                    ? "inherit"
+                    : registerForm.phone_number.length === 10
+                    ? "green"
+                    : "red",
+              }}
+            >
+              {registerForm.phone_number === ""
+                ? "Phone number must be exactly 10 digits"
+                : registerForm.phone_number.length === 10
+                ? "Valid phone number ✔"
+                : "Phone number must be 10 digits"}
+            </FormHelperText>
             <TextField
               label="Room No."
               name="room_number"
@@ -271,7 +323,43 @@ const LoginPage = () => {
               value={registerForm.email}
               onChange={handleRegisterChange}
               required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor:
+                      registerForm.email === ""
+                        ? "default"
+                        : emailRegex.test(registerForm.email)
+                        ? "green"
+                        : "red",
+                  },
+                  "&:hover fieldset": {
+                    borderColor:
+                      registerForm.email === ""
+                        ? "default"
+                        : emailRegex.test(registerForm.email)
+                        ? "green"
+                        : "red",
+                  },
+                },
+              }}
             />
+            <FormHelperText
+              sx={{
+                color:
+                  registerForm.email === ""
+                    ? "inherit"
+                    : emailRegex.test(registerForm.email)
+                    ? "green"
+                    : "red",
+              }}
+            >
+              {registerForm.email === ""
+                ? "Enter a valid email (e.g., user@example.com)"
+                : emailRegex.test(registerForm.email)
+                ? "Valid email ✔"
+                : "Invalid email format"}
+            </FormHelperText>
             <TextField
               label="Password"
               name="password"
@@ -280,7 +368,44 @@ const LoginPage = () => {
               value={registerForm.password}
               onChange={handleRegisterChange}
               required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor:
+                      registerForm.password === ""
+                        ? "default"
+                        : passwordRegex.test(registerForm.password)
+                        ? "green"
+                        : "red",
+                  },
+                  "&:hover fieldset": {
+                    borderColor:
+                      registerForm.password === ""
+                        ? "default"
+                        : passwordRegex.test(registerForm.password)
+                        ? "green"
+                        : "red",
+                  },
+                },
+              }}
             />
+
+            <FormHelperText
+              sx={{
+                color:
+                  registerForm.password === ""
+                    ? "inherit"
+                    : passwordRegex.test(registerForm.password)
+                    ? "green"
+                    : "red",
+              }}
+            >
+              {registerForm.password === ""
+                ? "Password must be at least 8 chars, include uppercase, lowercase, number & special symbol"
+                : passwordRegex.test(registerForm.password)
+                ? "Strong password ✔"
+                : "Password does not meet requirements"}
+            </FormHelperText>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setRegisterOpen(false)}>Cancel</Button>

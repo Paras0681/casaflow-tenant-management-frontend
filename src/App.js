@@ -11,6 +11,8 @@ import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import PropertiesPage from "./pages/PropertiesPage"
 import PaymentPage from "./pages/PaymentPage";
+import ForgotPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -48,6 +50,8 @@ function App() {
               <Route path="/payments" element={
                 <ProtectedRoute><PaymentPage /></ProtectedRoute>
               } />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             </Routes>
           </AuthProvider>
         </Router>

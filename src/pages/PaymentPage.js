@@ -98,110 +98,121 @@ const PaymentsPage = () => {
 
   return (
     <PageWrapper pageTitle="Payments">
-      <Paper
-        elevation={4}
-        sx={{ p: 3, mb: 4, maxWidth: 500, mx: "auto", borderRadius: "12px" }}
-      >
-        <Typography variant="h6" fontWeight="bold" mb={2}>
-          Mark a Payment
-        </Typography>
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <Typography variant="subtitle2" fontWeight="bold">
-            Please read before uploading:
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            <b>• Paste the correct Invoice ID from invoice PDF.</b>
-            <br />
-            <b>• Payment UTR is the 12 digit code in successful transaction.</b>
-            <br />
-            • Only JPG, PNG, PDF files are allowed.
-            <br />
-            • File size must be between <b>50KB and 100KB</b>.
-            <br />
-            • Ensure the document is clear and not blurry.
-          </Typography>
-        </Alert>
-
-        <FormComponent
-          formConfig={paymentFormConfig}
-          apiUrl="/payments/mark-payments/"
-          formValues={formValues}
-          setFormValues={setFormValues}
-          submitLabel="Submit Payment"
-          onSuccess={handlePaymentSuccess}
-        />
-      </Paper>
-
-      <Box sx={{ maxWidth: 500, mx: "auto" }}>
-        <TextField
-          placeholder="Search payments..."
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setCurrentPage(1); // reset page on search change
+        <Box
+          sx={{
+            display: "flex",
+            gap: 3,
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "flex-start", // prevents stretch
           }}
-          fullWidth
-          sx={{ mb: 2 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        >
 
-        {pageCount > 1 && (
-          <Pagination
-            count={pageCount}
-            page={currentPage}
-            onChange={handlePageChange}
-            sx={{ mb: 2, display: "flex", justifyContent: "center" }}
+        {/* Left side: Form */}
+        <Box sx={{ flex: "1 1 40%" }}>
+          <Paper elevation={4} sx={{ p: 3, borderRadius: "12px" }}>
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              Mark a Payment
+            </Typography>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" fontWeight="bold">
+                Please read before uploading:
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                <b>• Paste the correct Invoice ID from invoice PDF.</b>
+                <br />
+                <b>• Payment UTR is the 12 digit code in successful transaction.</b>
+                <br />
+                • Only JPG, PNG, PDF files are allowed.
+                <br />
+                • File size must be between <b>50KB and 100KB</b>.
+                <br />
+                • Ensure the document is clear and not blurry.
+              </Typography>
+            </Alert>
+
+            <FormComponent
+              formConfig={paymentFormConfig}
+              apiUrl="/payments/mark-payments/"
+              formValues={formValues}
+              setFormValues={setFormValues}
+              submitLabel="Submit Payment"
+              onSuccess={handlePaymentSuccess}
+            />
+          </Paper>
+        </Box>
+
+        {/* Right side: Search bar, pagination, and table */}
+        <Box sx={{ flex: "1 1 60%" }}>
+          <TextField
+            placeholder="Search payments..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            fullWidth
+            sx={{ mb: 2 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
-        )}
-      </Box>
 
-      <Box sx={{ maxWidth: "100%", overflowX: "auto", maxWidth: 900, mx: "auto" }}>
-        <TableContainer component={Paper}>
-          <Table aria-label="payments table" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>Invoice ID</TableCell>
-                <TableCell>Payment ID</TableCell>
-                <TableCell>Payment UTR</TableCell>
-                <TableCell>Uploaded By</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Paid Date</TableCell>
-                <TableCell>Screenshot</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedPayments.map((p) => (
-                <TableRow key={p.id} hover>
-                  <TableCell>{p.invoice_id}</TableCell>
-                  <TableCell>{p.payment_id}</TableCell>
-                  <TableCell>{p.payment_utr}</TableCell>
-                  <TableCell>{p.uploaded_by}</TableCell>
-                  <TableCell>₹{p.amount}</TableCell>
-                  <TableCell>{p.paid_at}</TableCell>
-                  <TableCell>
-                    {p.payment_receipt_url ? (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleView(p.payment_receipt_url)}
-                      >
-                        View
-                      </Button>
-                    ) : (
-                      "N/A"
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+          {pageCount > 1 && (
+            <Pagination
+              count={pageCount}
+              page={currentPage}
+              onChange={handlePageChange}
+              sx={{ mb: 2, display: "flex", justifyContent: "center" }}
+            />
+          )}
+
+          <Box sx={{ overflowX: "auto" }}>
+            <TableContainer component={Paper}>
+              <Table aria-label="payments table" size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Invoice ID</TableCell>
+                    <TableCell>Payment ID</TableCell>
+                    <TableCell>Payment UTR</TableCell>
+                    <TableCell>Uploaded By</TableCell>
+                    <TableCell>Amount</TableCell>
+                    <TableCell>Paid Date</TableCell>
+                    <TableCell>Screenshot</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedPayments.map((p) => (
+                    <TableRow key={p.id} hover>
+                      <TableCell>{p.invoice_id}</TableCell>
+                      <TableCell>{p.payment_id}</TableCell>
+                      <TableCell>{p.payment_utr}</TableCell>
+                      <TableCell>{p.uploaded_by}</TableCell>
+                      <TableCell>₹{p.amount}</TableCell>
+                      <TableCell>{p.paid_at}</TableCell>
+                      <TableCell>
+                        {p.payment_receipt_url ? (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => handleView(p.payment_receipt_url)}
+                          >
+                            View
+                          </Button>
+                        ) : (
+                          "N/A"
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Box>
       </Box>
     </PageWrapper>
   );

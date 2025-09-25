@@ -11,13 +11,11 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DownloadIcon from "@mui/icons-material/Download";
 
-const DisplayCard = ({ file, fields, showActions = true }) => {
-  // Function to handle View (example)
+const DisplayCard = ({ file, fields, showActions = true, actions }) => {
   const handleView = () => {
     if (file.file_url) window.open(file.file_url, "_blank");
   };
 
-  // Function to handle Download (example)
   const handleDownload = () => {
     if (file.file_url) {
       const link = document.createElement("a");
@@ -33,12 +31,11 @@ const DisplayCard = ({ file, fields, showActions = true }) => {
         display: "flex",
         borderRadius: 2,
         boxShadow: 3,
-        height: 140,
+        height: 180,
         position: "relative",
         "&:hover .actions-container": showActions ? { opacity: 1, pointerEvents: "auto" } : {},
       }}
     >
-      {/* Left image */}
       <CardMedia
         component="img"
         image={file.file_url}
@@ -46,7 +43,6 @@ const DisplayCard = ({ file, fields, showActions = true }) => {
         sx={{ width: 140, objectFit: "contain", p: 1, bgcolor: "#f5f5f5" }}
       />
 
-      {/* Content */}
       <CardContent
         sx={{
           flex: 1,
@@ -72,7 +68,7 @@ const DisplayCard = ({ file, fields, showActions = true }) => {
           </Box>
         ))}
 
-        {showActions && (
+        {(actions || showActions) && (
           <Box
             className="actions-container"
             sx={{
@@ -81,21 +77,27 @@ const DisplayCard = ({ file, fields, showActions = true }) => {
               right: 8,
               display: "flex",
               gap: 1,
-              opacity: 0,
-              pointerEvents: "none",
+              opacity: actions ? 1 : 0,
+              pointerEvents: "auto",
               transition: "opacity 0.3s ease",
             }}
           >
-            <Tooltip title="View">
-              <IconButton size="small" onClick={handleView}>
-                <VisibilityIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Download">
-              <IconButton size="small" onClick={handleDownload}>
-                <DownloadIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            {actions ? (
+              actions
+            ) : (
+              <>
+                <Tooltip title="View">
+                  <IconButton size="small" onClick={handleView}>
+                    <VisibilityIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Download">
+                  <IconButton size="small" onClick={handleDownload}>
+                    <DownloadIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
           </Box>
         )}
       </CardContent>
