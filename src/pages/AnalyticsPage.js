@@ -29,7 +29,7 @@ import {
   Legend,
 } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2";
-import api from "../api"
+import api from "../api";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
