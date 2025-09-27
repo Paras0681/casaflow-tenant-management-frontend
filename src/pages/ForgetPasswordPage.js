@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Paper, Typography, TextField, Button, Alert } from "@mui/material";
-import api from "../api"
+import api from "../api";
 import bgImage from "../images/login_page_background_image.png";
 
 const ForgotPasswordPage = () => {
