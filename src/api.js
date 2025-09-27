@@ -1,68 +1,57 @@
-// src/api.js
 import axios from "axios";
+import { getApiUrl } from "./config";
 
-const api = axios.create({
-  baseURL: "https://uniform-emelita-tenant-management-03fea76d.koyeb.app/api/",
-});
+let apiInstance = null;
 
-// Request interceptor → attach token
-api.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem("access");
-    const refreshToken = localStorage.getItem("refresh");
+export async function getApi() {
+  if (!apiInstance) {
+    const baseURL = await getApiUrl(); // Get backend URL at runtime
 
-    // console.log("[API REQUEST] Access Token:", accessToken);
-    // console.log("[API REQUEST] Refresh Token:", refreshToken);
+    apiInstance = axios.create({
+      baseURL,
+    });
 
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+    // Request interceptor → attach token
+    apiInstance.interceptors.request.use(
+      (config) => {
+        const accessToken = localStorage.getItem("access");
+        if (accessToken) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-// Response interceptor → auto-refresh on 401
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Skip login/refresh endpoints
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("/users/login/") &&
-      !originalRequest.url.includes("/users/refresh/")
-    ) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem("refresh");
-        console.log("[API REFRESH] Using Refresh Token:", refreshToken);
-
-        const res = await axios.post("http://127.0.0.1:8000/api/users/refresh/", {
-          refresh: refreshToken,
-        });
-
-        console.log("[API REFRESH] New Access Token:", res.data.access);
-
-        localStorage.setItem("access", res.data.access);
-
-        // Retry original request with new access token
-        originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
-        return api(originalRequest);
-      } catch (refreshErr) {
-        console.error("[API REFRESH ERROR] Refresh token expired or invalid", refreshErr);
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        localStorage.removeItem("user");
-        window.location.href = "/login";
+    // Response interceptor → auto-refresh on 401
+    apiInstance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          !originalRequest.url.includes("/users/login/") &&
+          !originalRequest.url.includes("/users/refresh/")
+        ) {
+          originalRequest._retry = true;
+          try {
+            const refreshToken = localStorage.getItem("refresh");
+            const res = await axios.post(`${await getApiUrl()}/users/refresh/`, {
+              refresh: refreshToken,
+            });
+            localStorage.setItem("access", res.data.access);
+            originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+            return apiInstance(originalRequest);
+          } catch (refreshErr) {
+            localStorage.clear();
+            window.location.href = "/login";
+          }
+        }
+        return Promise.reject(error);
       }
-    }
-
-    return Promise.reject(error);
+    );
   }
-);
 
-export default api;
+  return apiInstance;
+}
