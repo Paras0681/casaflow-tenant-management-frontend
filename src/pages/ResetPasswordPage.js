@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Paper, Typography, TextField, Button, Alert } from "@mui/material";
-import api from "../api";
+import { getApi } from "../api";
 import bgImage from "../images/login_page_background_image.png";
 
 const ResetPasswordPage = () => {
@@ -26,6 +26,7 @@ const ResetPasswordPage = () => {
     setSuccess("");
 
     try {
+      const api = await getApi();
       const response = await api.post(`/users/reset-password/${token}/`, form);
       setSuccess(response.data.message || "Password reset successfully.");
       setForm({ password: "", confirm_password: "" });

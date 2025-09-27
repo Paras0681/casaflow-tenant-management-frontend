@@ -29,7 +29,7 @@ import PageWrapper from "../components/PageWrapper.js";
 import DisplayCard from "../components/DisplayCard.js";
 import FormComponent from "../components/FormComponent.js";
 
-import api from "../api";
+import { getApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 
@@ -131,6 +131,7 @@ const GenerateBillPage = () => {
   useEffect(() => {
     const fetchBills = async () => {
       try {
+        const api = await getApi();
         const response = await api.get("/tenants/files/");
         setUploadedBills(response.data);
       } catch (error) {
@@ -143,6 +144,7 @@ const GenerateBillPage = () => {
   useEffect(() => {
     const fetchReceipts = async () => {
       try {
+        const api = await getApi();
         const response = await api.get("/tenants/invoice/");
         setUploadedReceipts(response.data || []);
         const get_rooms_list = await api.get("/tenants/rooms/");
@@ -269,6 +271,7 @@ const GenerateBillPage = () => {
 
 const handleMarkPaid = async (invoice) => {
   try {
+    const api = await getApi();
     const response = await api.post("/tenants/mark-invoice/", {
       invoice_id: invoice.invoice_id,
     });

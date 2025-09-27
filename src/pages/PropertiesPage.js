@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import api from "../api";
+import { getApi } from "../api";
 import FormComponent from "../components/FormComponent";
 import DisplayCard from "../components/DisplayCard";
 import property_logo from "../images/property_logo.jpg";
@@ -47,6 +47,7 @@ const PropertyRoomPage = () => {
 
   const fetchProperties = async () => {
     try {
+      const api = await getApi();
       const res = await api.get("/tenants/properties/");
       setProperties(res.data);
     } catch (err) {
@@ -57,6 +58,7 @@ const PropertyRoomPage = () => {
 
   const fetchRooms = async () => {
     try {
+      const api = await getApi();
       const res = await api.get("/tenants/rooms/");
       setRooms(res.data);
     } catch (err) {

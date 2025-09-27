@@ -13,7 +13,7 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
-import api from "../api";
+import { getApi } from "../api";
 
 const FormComponent = ({
   formConfig,
@@ -90,6 +90,7 @@ const FormComponent = ({
 
     try {
       setLoadingModalOpen(true);
+      const api = await getApi();
       const response = await api.post(apiUrl, submitData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
