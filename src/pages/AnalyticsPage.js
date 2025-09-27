@@ -29,7 +29,7 @@ import {
   Legend,
 } from "chart.js";
 import { Pie, Bar } from "react-chartjs-2";
-import { getApi } from "../api";
+import api from "../api"
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
@@ -51,7 +51,6 @@ const AnalyticsPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const api = await getApi();
         const [summaryRes, yearlyRes] = await Promise.all([
           api.get("/tenants/analytics-summary/"),
           api.get("/tenants/yearlydata/")

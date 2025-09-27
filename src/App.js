@@ -2,14 +2,13 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import GenerateBillPage from "./pages/GenerateBillPage";
 import TenantsProfilePage from "./pages/TenantsProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import PropertiesPage from "./pages/PropertiesPage"
+import PropertiesPage from "./pages/PropertiesPage";
 import PaymentPage from "./pages/PaymentPage";
 import ForgotPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -17,14 +16,17 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
+// Use MUI theme
 const theme = createTheme({
   typography: { fontFamily: "Poppins, Roboto, Arial, sans-serif" },
   palette: { background: { default: "#f5f5f5" } },
 });
 
 function App() {
+  // Optional: log env variables to verify
+  console.log("API URL:", process.env.REACT_APP_API_URL);
+
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
@@ -56,7 +58,6 @@ function App() {
           </AuthProvider>
         </Router>
       </ThemeProvider>
-    </GoogleOAuthProvider>
   );
 }
 

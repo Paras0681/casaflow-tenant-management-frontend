@@ -16,7 +16,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import bgImage from "../images/login_page_background_image.png";
-import { getApi } from "../api";
+import api from "../api"
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -62,7 +62,6 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const api = await getApi();
       const response = await api.post("/users/login/", form);
       const { access, refresh, user } = response.data;
 
@@ -84,7 +83,6 @@ const LoginPage = () => {
     setRegisterSuccess(false);
 
     try {
-      const api = await getApi();
       await api.post("/users/register/", registerForm);
 
       // Registration successful → show alert on login page

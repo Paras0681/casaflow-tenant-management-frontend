@@ -18,7 +18,7 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { getApi } from "../api";
+import api from "../api"
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 
 function CustomTabPanel(props) {
@@ -59,7 +59,6 @@ const TenantsProfilePage = () => {
   // Fetch tenants
   const fetchTenants = async () => {
     try {
-      const api = await getApi();
       const response = await api.get("/tenants/tenants-profile/");
       setTenants(response.data);
       setFilteredTenants(response.data);
@@ -110,7 +109,6 @@ const TenantsProfilePage = () => {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
     try {
-      const api = await getApi();
       await api.patch(`tenants/tenants-profile/${editTenant.account_id}/`, {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -132,7 +130,6 @@ const TenantsProfilePage = () => {
   const handleSubmitNew = async (e) => {
     e.preventDefault();
     try {
-      const api = await getApi();
       await api.post("tenants/tenants-profile/", formData);
       setSuccess(true);
       setError("");

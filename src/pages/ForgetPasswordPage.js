@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Paper, Typography, TextField, Button, Alert } from "@mui/material";
-import { getApi } from "../api";
+import api from "../api"
 import bgImage from "../images/login_page_background_image.png";
 
 const ForgotPasswordPage = () => {
@@ -20,7 +20,6 @@ const ForgotPasswordPage = () => {
     setSuccess("");
 
     try {
-      const api = await getApi();
       const response = await api.post("/users/forgot-password/", { email });
       setSuccess(response.data.message || "Password reset link sent to your email.");
       setEmail("");

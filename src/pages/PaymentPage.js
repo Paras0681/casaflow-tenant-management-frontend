@@ -17,7 +17,7 @@ import {
   Pagination,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { getApi } from "../api";
+import api from "../api"
 import FormComponent from "../components/FormComponent";
 
 // Define payment form fields
@@ -57,7 +57,6 @@ const PaymentsPage = () => {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const api = await getApi();
         const response = await api.get("/payments/get-payments");
         if (response.status === 200) {
           setPayments(response.data);
