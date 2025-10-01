@@ -229,7 +229,7 @@ const AnalyticsPage = () => {
           {/* Summary Cards - Only for Admin */}
           {user?.is_staff && (
             <Grid container spacing={3} sx={{ mb: 3 }}>
-              <Grid item xs={12} md={6} lg={3}>
+              <Grid xs={12} md={6} lg={3}>
                 <Card sx={{ p: 2, boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -242,7 +242,7 @@ const AnalyticsPage = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={3}>
+              <Grid xs={12} md={6} lg={3}>
                 <Card sx={{ p: 2, boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -255,7 +255,7 @@ const AnalyticsPage = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={3}>
+              <Grid xs={12} md={6} lg={3}>
                 <Card sx={{ p: 2, boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -268,7 +268,7 @@ const AnalyticsPage = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={3}>
+              <Grid xs={12} md={6} lg={3}>
                 <Card sx={{ p: 2, boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -281,7 +281,7 @@ const AnalyticsPage = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={3}>
+              <Grid xs={12} md={6} lg={3}>
                 <Card sx={{ p: 2, boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="subtitle2" color="text.secondary">
@@ -299,7 +299,7 @@ const AnalyticsPage = () => {
 
           {/* Charts */}
           <Grid container spacing={3} sx={{ mb: 3 }} alignItems="stretch">
-            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+            <Grid xs={12} md={6} sx={{ display: "flex" }}>
               <Card sx={{ p: 2, boxShadow: 3, height: "100%", display: "flex", flexDirection: "column" }}>
                 <Typography variant="h6" gutterBottom>
                   INVOICE PAYMENT STATUS
@@ -310,7 +310,7 @@ const AnalyticsPage = () => {
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+            <Grid xs={12} md={6} sx={{ display: "flex" }}>
               <Card sx={{ p: 2, boxShadow: 3, height: "400px", display: "flex", flexDirection: "column" }}>
                 <Typography variant="h6" gutterBottom>
                   MONTHLY REVENUE SEGREGATION

@@ -1,20 +1,16 @@
-// src/api.js
 import axios from "axios";
 
-// console.log("API URL:", process.env.REACT_APP_API_URL);
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
-});
+const baseURL =
+  process.env.REACT_APP_API_URL || "http://127.0.0.1:8000/api/";
 
-// Request interceptor → attach token
+console.log("✅ API BaseURL:", baseURL);
+
+const api = axios.create({ baseURL });
+
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("access");
-    const refreshToken = localStorage.getItem("refresh");
-
-    // console.log("[API REQUEST] Access Token:", accessToken);
-    // console.log("[API REQUEST] Refresh Token:", refreshToken);
-
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -23,13 +19,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor → auto-refresh on 401
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip login/refresh endpoints
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -42,22 +37,19 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem("refresh");
         console.log("[API REFRESH] Using Refresh Token:", refreshToken);
 
-        const res = await axios.post("http://127.0.0.1:8000/api/users/refresh/", {
-          refresh: refreshToken,
-        });
+        // ✅ use api instance here (no hardcoded localhost)
+        const res = await api.post("/users/refresh/", { refresh: refreshToken });
 
         console.log("[API REFRESH] New Access Token:", res.data.access);
 
         localStorage.setItem("access", res.data.access);
 
-        // Retry original request with new access token
+        // Retry with new token
         originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
         return api(originalRequest);
       } catch (refreshErr) {
         console.error("[API REFRESH ERROR] Refresh token expired or invalid", refreshErr);
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        localStorage.removeItem("user");
+        localStorage.clear();
         window.location.href = "/login";
       }
     }

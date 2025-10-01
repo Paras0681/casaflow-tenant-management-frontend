@@ -8,7 +8,6 @@ import {
   Tab,
   TextField,
   InputAdornment,
-  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import api from "../api"
@@ -19,7 +18,6 @@ import room_logo from "../images/room_logo.jpg";
 
 const PropertyRoomPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const theme = useTheme();
 
   const [properties, setProperties] = useState([]);
   const [rooms, setRooms] = useState([]);

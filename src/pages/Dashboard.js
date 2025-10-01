@@ -42,7 +42,7 @@ const Dashboard = () => {
       {/* Stats Cards */}
       <Grid container spacing={3} mb={4}>
         {statsData.map((stat, index) => (
-          <Grid item xs={12} md={6} lg={3} key={index}>
+          <Grid xs={12} md={6} lg={3} key={index}>
             <Paper
               sx={{
                 p: 3,
@@ -70,7 +70,7 @@ const Dashboard = () => {
       <Typography variant="h6" fontWeight="bold" mb={2}>Recent Activity</Typography>
       <Grid container spacing={3}>
         {recentActivities.map((activity, index) => (
-          <Grid item xs={12} md={6} lg={3} key={index}>
+          <Grid xs={12} md={6} lg={3} key={index}>
             <Paper
               sx={{
                 p: 3,

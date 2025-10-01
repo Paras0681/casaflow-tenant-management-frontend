@@ -21,7 +21,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -97,9 +96,7 @@ const GenerateBillPage = () => {
     bill_date: "",
   });
 
-  // Material UI modal alert state
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+
   const [statusDialog, setStatusDialog] = useState({
   open: false,
   type: "", // "success" | "error"
