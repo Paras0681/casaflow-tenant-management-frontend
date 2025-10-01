@@ -23,8 +23,6 @@ const theme = createTheme({
 });
 
 function App() {
-  // Optional: log env variables to verify
-  console.log("API URL:", process.env.REACT_APP_API_URL);
 
   return (
       <ThemeProvider theme={theme}>
